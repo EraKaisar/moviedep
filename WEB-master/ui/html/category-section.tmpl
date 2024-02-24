@@ -1,0 +1,8 @@
+{{ define "category-section" }}
+  <div class="category-section">
+    <h3>{{ .Category }}</h3>
+    {{ range .Articles }}
+      {{ template "content" . }}
+    {{ end }}
+  </div>
+{{ end }}

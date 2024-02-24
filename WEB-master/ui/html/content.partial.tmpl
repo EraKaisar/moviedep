@@ -1,0 +1,67 @@
+{{ define "content" }}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">{{ .Title }}</h5>
+        <p class="card-genre">{{ .Genre }}</p>
+        <p class="card-rating">{{ .Rating }}</p>
+        <p class="card-session-time">{{ .SessionTime }}</p>
+        <button class="btn btn-primary mb-4" onclick="toggleUpdateForm('{{ .ID }}')">Update</button>
+        <form id="update-form-{{ .ID }}" method="POST" action="/updateMovie" style="display: none;">
+            <input type="hidden" name="id" value="{{ .ID }}">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" class="form-control" id="title" name="title" value="{{ .Title }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="genre" class="form-label">Genre:</label>
+                <select class="form-select" id="genre" name="genre" required>
+                    <option value="horror" {{ if eq .Genre "horror" }} selected {{ end }}>Horror</option>
+                    <option value="comedy" {{ if eq .Genre "comedy" }} selected {{ end }}>Comedy</option>
+                    <option value="drama" {{ if eq .Genre "drama" }} selected {{ end }}>Drama</option>
+                    <option value="scifi" {{ if eq .Genre "scifi" }} selected {{ end }}>Scifi</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating:</label>
+                <input type="number" class="form-control" id="rating" name="rating" value="{{ .Rating }}" min="1" max="10" required>
+            </div>
+            <div class="mb-3">
+                <label for="sessionTime" class="form-label">Session Time:</label>
+                <input type="datetime-local" class="form-control" id="sessionTime" name="sessionTime" value="{{ .SessionTime }}" required>
+            </div>
+            <button class="btn btn-warning update-movie-btn" type="submit" data-movie-id="{{ .ID }}">Update</button>
+        </form>
+
+    <form id="delete-form-{{ .ID }}" onsubmit="deleteMovie('{{ .ID.Hex }}'); return false;">
+        <input type="hidden" name="id" value="{{ .ID }}">
+        <button class="btn btn-danger delete-movie-btn" type="submit">Delete</button>
+    </form>
+    </div>
+</div>
+<script src="/static/js/main.js"></script>
+<script>
+
+function deleteMovie(movieId) {
+    if (confirm('Are you sure you want to delete this movie?')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('DELETE', '/deleteMovie?id=' + movieId, true);
+        xhr.setRequestHeader('Content-Type', 'application/json'); // Set content type
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert('Movie deleted successfully');
+                location.reload();
+            } else {
+                alert('Error deleting movie. Please try again.');
+            }
+        };
+
+        xhr.send();
+    }
+}
+    function toggleUpdateForm(movieId) {
+        var updateForm = document.getElementById('update-form-' + movieId);
+        updateForm.style.display = (updateForm.style.display === 'none' || updateForm.style.display === '') ? 'block' : 'none';
+    }
+</script>
+{{ end }}
